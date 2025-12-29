@@ -70,3 +70,31 @@ Manual deploy steps:
 2. On Render, "New +" → "Blueprint" → select your repo.
 3. Set `DATABASE_URL` and `NODE_VERSION` env vars in the service.
 4. Deploy; visit the service URL → `/health` and test APIs.
+
+## Phase 2 Script
+- Configure env in `backend/.env`:
+   - `API_BASE_URL` (default `http://localhost:3000`)
+   - `OPENAI_API_KEY` (optional; if absent, the script performs a naive merge)
+   - `OPENAI_MODEL` (default `gpt-4o-mini`)
+   - `PHASE2_LIMIT` number of articles to process (default 1)
+- Run locally:
+
+```
+Push-Location backend
+npm run dev   # in one terminal (API server)
+Pop-Location
+
+Push-Location backend
+npm run phase2
+Pop-Location
+```
+
+What it does:
+- Fetches articles from the CRUD API.
+- Searches Google for each title, picks top 2 external blog/article links.
+- Scrapes those pages and extracts clean text.
+- Calls an LLM (if API key provided) to rewrite and format the article inspired by references.
+- Publishes a new article via `POST /api/articles` with references appended.
+
+Notes:
+- Google HTML may change; if search fails, add a SERP API (e.g., SerpAPI or Google CSE) and wire it into `src/phase2.js`.
