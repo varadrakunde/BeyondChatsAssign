@@ -41,7 +41,7 @@ app.get('/api/articles', async (req, res) => {
 });
 
 app.get('/api/articles/:id', async (req, res) => {
-  const id = Number(req.params.id);
+  const id = String(req.params.id);
   try {
     const article = await prisma.article.findUnique({ where: { id } });
     if (!article) return res.status(404).json({ error: 'Not found' });
@@ -64,7 +64,7 @@ app.post('/api/articles', async (req, res) => {
 });
 
 app.put('/api/articles/:id', async (req, res) => {
-  const id = Number(req.params.id);
+  const id = String(req.params.id);
   const { title, slug, url, author, summary, content, publishedAt } = req.body;
   try {
     const article = await prisma.article.update({
@@ -78,7 +78,7 @@ app.put('/api/articles/:id', async (req, res) => {
 });
 
 app.delete('/api/articles/:id', async (req, res) => {
-  const id = Number(req.params.id);
+  const id = String(req.params.id);
   try {
     await prisma.article.delete({ where: { id } });
     res.status(204).send();
