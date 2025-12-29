@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: beyondchats-backend
+    env: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm ci && npx prisma generate
+    startCommand: node src/server.js
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: DATABASE_URL
+        sync: false
+  - type: cron
+    name: scraper-cron
+    env: node
+    rootDir: backend
+    schedule: "0 2 * * *" # daily at 02:00 UTC
+    command: npm run scrape

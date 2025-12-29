@@ -56,3 +56,17 @@ curl http://localhost:3000/api/articles/1
 ## Notes
 - Keep README updated with any new endpoints, pages, and setup steps.
 - Add CI and tests as you implement features.
+
+## Deployment (Render + Neon Postgres)
+- **Create Postgres (Neon):** Create a free database; copy the connection string (add `sslmode=require`).
+- **Set env vars on Render:** `DATABASE_URL`=`postgresql://...` and `NODE_VERSION=20`.
+- **Add render.yaml:** Present at repo root to define the web service and a cron job for the scraper.
+- **Build/Start:** Render runs `npm ci && npx prisma generate` and starts with `node src/server.js`.
+- **Migrate DB (prod):** Use `prisma migrate deploy` during build or manually via shell.
+- **Scraper:** The cron job runs `npm run scrape` daily to refresh articles.
+
+Manual deploy steps:
+1. Push repo to GitHub (already done).
+2. On Render, "New +" → "Blueprint" → select your repo.
+3. Set `DATABASE_URL` and `NODE_VERSION` env vars in the service.
+4. Deploy; visit the service URL → `/health` and test APIs.

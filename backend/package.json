@@ -10,6 +10,7 @@
     "lint": "echo 'add eslint later'",
     "prisma:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --name init",
+    "db:deploy": "prisma migrate deploy",
     "scrape": "node src/scrape.js"
   },
   "dependencies": {
