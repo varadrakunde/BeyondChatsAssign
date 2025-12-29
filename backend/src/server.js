@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import { prisma } from './db.js';
 
 dotenv.config();
 
@@ -18,6 +19,72 @@ app.get('/health', (req, res) => {
 
 app.post('/api/echo', (req, res) => {
   res.json({ received: req.body });
+});
+
+// CRUD APIs for articles
+app.get('/api/articles', async (req, res) => {
+  const { q, page = 1, pageSize = 10 } = req.query;
+  const skip = (Number(page) - 1) * Number(pageSize);
+  const take = Number(pageSize);
+  const where = q
+    ? { OR: [ { title: { contains: q } }, { summary: { contains: q } }, { content: { contains: q } } ] }
+    : {};
+  try {
+    const [items, total] = await Promise.all([
+      prisma.article.findMany({ where, skip, take, orderBy: { publishedAt: 'asc' } }),
+      prisma.article.count({ where })
+    ]);
+    res.json({ items, total, page: Number(page), pageSize: Number(pageSize) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/articles/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    const article = await prisma.article.findUnique({ where: { id } });
+    if (!article) return res.status(404).json({ error: 'Not found' });
+    res.json(article);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/articles', async (req, res) => {
+  const { title, slug, url, author, summary, content, publishedAt } = req.body;
+  try {
+    const article = await prisma.article.create({
+      data: { title, slug, url, author, summary, content, publishedAt: publishedAt ? new Date(publishedAt) : null }
+    });
+    res.status(201).json(article);
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+});
+
+app.put('/api/articles/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  const { title, slug, url, author, summary, content, publishedAt } = req.body;
+  try {
+    const article = await prisma.article.update({
+      where: { id },
+      data: { title, slug, url, author, summary, content, publishedAt: publishedAt ? new Date(publishedAt) : null }
+    });
+    res.json(article);
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+});
+
+app.delete('/api/articles/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    await prisma.article.delete({ where: { id } });
+    res.status(204).send();
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
 });
 
 app.listen(PORT, () => {
