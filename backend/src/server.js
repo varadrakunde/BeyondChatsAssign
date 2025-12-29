@@ -31,7 +31,7 @@ app.get('/api/articles', async (req, res) => {
     : {};
   try {
     const [items, total] = await Promise.all([
-      prisma.article.findMany({ where, skip, take, orderBy: { publishedAt: 'asc' } }),
+      prisma.article.findMany({ where, skip, take, orderBy: [ { publishedAt: 'desc' }, { createdAt: 'desc' } ] }),
       prisma.article.count({ where })
     ]);
     res.json({ items, total, page: Number(page), pageSize: Number(pageSize) });
