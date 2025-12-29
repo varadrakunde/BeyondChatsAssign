@@ -29,7 +29,30 @@ function cleanText(s){
     .trim();
 }
 
-async function googleSearch(title){
+const SERPAPI_KEY = process.env.SERPAPI_KEY || '';
+const GOOGLE_CSE_KEY = process.env.GOOGLE_CSE_KEY || '';
+const GOOGLE_CSE_CX = process.env.GOOGLE_CSE_CX || '';
+
+async function serpapiSearch(title){
+  const url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(title)}&api_key=${SERPAPI_KEY}`;
+  const res = await fetch(url);
+  if (!res.ok) return [];
+  const json = await res.json();
+  const items = json.organic_results || [];
+  const links = items.map(i => i.link).filter(Boolean);
+  return links;
+}
+
+async function googleCseSearch(title){
+  const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_CSE_KEY}&cx=${GOOGLE_CSE_CX}&q=${encodeURIComponent(title)}`;
+  const res = await fetch(url);
+  if (!res.ok) return [];
+  const json = await res.json();
+  const links = (json.items || []).map(i => i.link).filter(Boolean);
+  return links;
+}
+
+async function googleHtmlSearch(title){
   const q = encodeURIComponent(title);
   const url = `https://www.google.com/search?q=${q}&hl=en`;
   const res = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119 Safari/537.36' } });
@@ -46,8 +69,19 @@ async function googleSearch(title){
       }
     }
   });
-  // Deduplicate and take first 2
-  return [...new Set(links)].slice(0,2);
+  return links;
+}
+
+async function getTopExternalLinks(title){
+  let links = [];
+  try {
+    if (SERPAPI_KEY) links = await serpapiSearch(title);
+    else if (GOOGLE_CSE_KEY && GOOGLE_CSE_CX) links = await googleCseSearch(title);
+    else links = await googleHtmlSearch(title);
+  } catch {}
+  // filter and dedupe; keep only external blogs/articles
+  const filtered = links.filter(u => u && !/beyondchats\.com/i.test(u) && /^https?:\/\//i.test(u) && !/\.pdf$/i.test(u));
+  return [...new Set(filtered)].slice(0, 2);
 }
 
 function pickMainContainer($){
@@ -155,7 +189,7 @@ async function main(){
   const targets = items.slice(0, LIMIT);
   for (const art of targets){
     console.log('Processing:', art.title);
-    const links = await googleSearch(art.title);
+    const links = await getTopExternalLinks(art.title);
     if (links.length === 0){ console.log('No links found, skipping'); continue; }
     const [l1, l2] = links;
     const [ref1, ref2] = await Promise.all([fetchArticleBody(l1), l2 ? fetchArticleBody(l2) : '']);

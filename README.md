@@ -98,3 +98,8 @@ What it does:
 
 Notes:
 - Google HTML may change; if search fails, add a SERP API (e.g., SerpAPI or Google CSE) and wire it into `src/phase2.js`.
+ - To use SerpAPI: set `SERPAPI_KEY` in `.env`.
+ - To use Google CSE: set `GOOGLE_CSE_KEY` and `GOOGLE_CSE_CX` in `.env`.
+
+## API Spec
+- See [docs/openapi.yaml](docs/openapi.yaml) (OpenAPI 3). Use Swagger Editor to view.
