@@ -132,6 +132,25 @@ async function listLocalArticles(){
   return data.items || [];
 }
 
+async function awaitApiReady(base = API_BASE, { retries = 10, delayMs = 500 } = {}){
+  const tryOnce = async () => {
+    try {
+      const r = await fetch(`${base}/health`);
+      if (r.ok) return true;
+    } catch {}
+    try {
+      const r2 = await fetch(`${base}/api/articles?page=1&pageSize=1`);
+      if (r2.ok) return true;
+    } catch {}
+    return false;
+  };
+  for (let i=0;i<retries;i++){
+    if (await tryOnce()) return true;
+    await sleep(delayMs);
+  }
+  throw new Error(`API not reachable at ${base}. Start the server: npm run dev (in backend).`);
+}
+
 async function llmRewrite({title, original, ref1, ref2, citations}){
   if (!OPENAI_API_KEY){
     // Fallback: naive merge
@@ -185,6 +204,7 @@ async function publishArticle({title, slug, url, author, summary, content}){
 }
 
 async function main(){
+  await awaitApiReady();
   const items = await listLocalArticles();
   const targets = items.slice(0, LIMIT);
   for (const art of targets){
