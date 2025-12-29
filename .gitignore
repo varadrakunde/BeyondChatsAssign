@@ -8,6 +8,8 @@ coverage/
 .env
 backend/.env
 frontend/.env
+# SQLite dev database (do not commit)
+backend/prisma/dev.db
 # Editor
 .vscode/
 # OS files
