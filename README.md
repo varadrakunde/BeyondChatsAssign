@@ -15,9 +15,10 @@ This repository sets up a clean, minimal full‑stack structure you can extend t
 10. Git Workflow
 
 ## Structure
-- backend/ — Node/Express server with health endpoint
-- frontend/ — Minimal HTML that calls the backend
+- backend/ — Node/Express server with health endpoint + CRUD
 - docs/ — Add specs, ERD, and decisions
+
+Note: `frontend/` was removed to focus Phase 1 on backend scraping + APIs.
 
 ## Quick Start (Backend)
 1. Copy `.env.example` to `.env`; ensure `DATABASE_URL="file:./dev.db"`
