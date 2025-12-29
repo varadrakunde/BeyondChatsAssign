@@ -13,8 +13,8 @@
     "lint": "echo 'add eslint later'",
     "heroku-postbuild": "prisma generate",
     "prisma:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev --name init",
-    "db:deploy": "prisma migrate deploy",
+    "db:migrate": "echo 'MongoDB uses db push instead of migrate'",
+    "db:deploy": "prisma db push",
     "scrape": "node src/scrape.js"
   },
   "dependencies": {

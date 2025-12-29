@@ -24,8 +24,8 @@ Note: `frontend/` was removed to focus Phase 1 on backend scraping + APIs.
 1. Copy `.env.example` to `.env`; ensure `DATABASE_URL="file:./dev.db"`
 2. Install deps (PowerShell):
    - `Push-Location backend; npm install; Pop-Location`
-3. Generate client and migrate DB:
-   - `Push-Location backend; npx prisma generate; npx prisma migrate dev --name init; Pop-Location`
+3. Generate client and sync schema (MongoDB):
+   - `Push-Location backend; npx prisma generate; npx prisma db push; Pop-Location`
 4. Scrape the 5 oldest blog articles (Phase 1):
    - `Push-Location backend; npm run scrape; Pop-Location`
 5. Run dev server:
@@ -57,12 +57,12 @@ curl http://localhost:3000/api/articles/1
 - Keep README updated with any new endpoints, pages, and setup steps.
 - Add CI and tests as you implement features.
 
-## Deployment (Render + Neon Postgres)
-- **Create Postgres (Neon):** Create a free database; copy the connection string (add `sslmode=require`).
-- **Set env vars on Render:** `DATABASE_URL`=`postgresql://...` and `NODE_VERSION=20`.
+## Deployment (Render + Mongo Atlas)
+- **Create MongoDB Atlas cluster:** Get a connection string and add a database name, e.g., `/beyondchats`.
+- **Set env vars on Render:** `DATABASE_URL`=`mongodb+srv://.../beyondchats` and `NODE_VERSION=20`.
 - **Add render.yaml:** Present at repo root to define the web service and a cron job for the scraper.
 - **Build/Start:** Render runs `npm ci && npx prisma generate` and starts with `node src/server.js`.
-- **Migrate DB (prod):** Use `prisma migrate deploy` during build or manually via shell.
+- **Sync schema (prod):** Use `prisma db push` during build or manually via shell.
 - **Scraper:** The cron job runs `npm run scrape` daily to refresh articles.
 
 Manual deploy steps:
