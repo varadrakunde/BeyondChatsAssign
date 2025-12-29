@@ -2,6 +2,11 @@
 
 This repository sets up a clean, minimal full‑stack structure you can extend to meet the assignment.
 
+## Live URLs
+- **Backend (Heroku):** https://beyondchats-assign-3f63a856a0ce.herokuapp.com
+- Health: https://beyondchats-assign-3f63a856a0ce.herokuapp.com/health
+- **Frontend (Netlify):** https://beyondchatsassign.netlify.app/
+
 ## Phases
 1. Scope & Criteria
 2. Architecture & Specs
@@ -17,10 +22,16 @@ This repository sets up a clean, minimal full‑stack structure you can extend t
 ## Structure
 - backend/ — Node/Express server with health endpoint + CRUD
 - docs/ — Add specs, ERD, and decisions
+ - frontend/ — React app (Vite) to browse articles
 
 Note: `frontend/` was removed to focus Phase 1 on backend scraping + APIs.
 
 ## Quick Start (Backend)
+## Quick Start (Frontend)
+1. Copy `frontend/.env.example` to `frontend/.env` and set `VITE_API_BASE` (defaults to http://localhost:3000)
+2. Install and run:
+   - `Push-Location frontend; npm install; npm run dev; Pop-Location`
+3. Open the URL shown by Vite (default http://localhost:5173)
 1. Copy `.env.example` to `.env`; ensure `DATABASE_URL="file:./dev.db"`
 2. Install deps (PowerShell):
    - `Push-Location backend; npm install; Pop-Location`

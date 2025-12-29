@@ -11,7 +11,7 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const apiBase = import.meta.env.VITE_API_BASE || 'http://localhost:3000'
+  const apiBase = import.meta.env.VITE_API_BASE || 'https://beyondchats-e0f665ffbf16.herokuapp.com/'
 
   async function load() {
     try {
